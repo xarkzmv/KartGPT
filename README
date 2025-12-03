@@ -1,0 +1,132 @@
+#  KartGPT: Vehículo Autónomo con Visión por Computador
+
+**KartGPT** es un sistema de conducción autónoma a escala que utiliza una arquitectura distribuida (*Edge-to-Fog Computing*). Un **ESP32-CAM** actúa como el "cuerpo" (sensores y actuadores) y un **PC** actúa como el "cerebro", procesando video en tiempo real mediante **Redes Neuronales Convolucionales (CNN)** para la detección de señales de tráfico y navegación en pista.
+
+---
+
+##  Requisitos Previos
+
+### Hardware
+* **Vehículo:** Chasis con motores DC y dirección (tipo diferencial o estándar).
+* **Controlador:** ESP32-CAM (modelo AI-Thinker recomendado).
+* **Alimentación:** (Se utilizaron 4 baterías de 1.5A)
+* **Extras:** LEDs de colores (Rojo, Azul, Verde) para el semáforo de inicio.
+
+### Software
+* **PC:** Python 3.9 o superior.
+* **ESP32:** Arduino IDE para cargar el firmware.
+* **Red:** Ambos dispositivos deben estar conectados a la misma red Wi-Fi.
+
+---
+
+## ⚙️ Instalación
+
+### 1. Configuración del Entorno Python (PC)
+Clona este repositorio e instala las dependencias necesarias:
+
+```bash
+git clone [https://github.com/tu_usuario/KartGPT.git](https://github.com/tu_usuario/KartGPT.git)
+cd KartGPT
+pip install tensorflow opencv-python numpy pynput matplotlib seaborn scikit-learn
+
+
+2. Configuración del Firmware (ESP32)
+
+    Abre el archivo .ino (ubicado en la carpeta arduino/ o raíz) con Arduino IDE.
+
+    Instala las librerías necesarias: ESP32 (Board Manager), ESPAsyncWebServer y AsyncTCP.
+
+    Modifica las credenciales de Wi-Fi en el código:
+    C++
+
+const char *ssid = "TU_RED_WIFI";
+const char *password = "TU_CONTRASEÑA";
+
+Sube el código al ESP32-CAM.
+
+Abre el Monitor Serie (115200 baudios) y anota la Dirección IP asignada (ej: 192.168.1.113).
+
+3. Configuración del Sistema (Python)
+
+Abre el archivo config.py y actualiza la IP con la que obtuviste en el paso anterior:
+Python
+
+# config.py
+ESP_IP = "192.168.1.113"  # <--- Tu IP aquí
+
+🚀 Ejecución del Proyecto
+
+Sigue estos pasos estrictos para iniciar el piloto automático:
+Paso 1: Iniciar el Vehículo (Modo Manual)
+
+    Enciende el KartGPT.
+
+    Desde tu PC o móvil, abre un navegador y ve a http://<IP_DEL_ESP32>.
+
+    Verás la interfaz estilo "GameBoy". Comprueba que el video funciona y que puedes mover el auto con las teclas WASD.
+
+Paso 2: Activar el Enlace de Datos
+
+Para que el script de Python pueda tomar el control del video, debes liberar el canal desde el navegador:
+
+    En la interfaz web, haz clic en el botón "MODO AUTO" (o presiona ESPACIO).
+
+    La pantalla se pondrá negra con el mensaje: "ESPERANDO PYTHON...".
+
+Paso 3: Iniciar el Cerebro (Python)
+
+En tu terminal de PC, dentro de la carpeta del proyecto, ejecuta:
+Bash
+
+python main.py
+
+    El sistema cargará los modelos (modelo_semáforo.h5 y modelo_pista.h5).
+
+    Se abrirá una ventana "KART GPT" mostrando lo que ve el auto.
+
+    Estado inicial: MODO: ESPERA. El auto estará quieto buscando una señal.
+
+Paso 4: ¡A Correr! 
+
+    Coloca una luz AZUL frente a la cámara.
+
+    La IA detectará la señal de inicio (GO!) y cambiará a MODO: AUTO.
+
+    El vehículo comenzará a navegar la pista automáticamente.
+
+    Para detenerlo de emergencia, muestra una luz ROJA o presiona q en la terminal del PC.
+
+🛠️ Herramientas de Desarrollo (Entrenamiento)
+
+Si quieres re-entrenar los modelos con tu propia pista:
+1. Recolección de Datos
+
+    Semáforo: Ejecuta python recolector_leds.py. Usa las teclas B (Azul), R (Rojo) y Espacio (Off) para guardar fotos.
+
+    Pista: Ejecuta python recolectar_datos.py. Conduce manualmente con WASD. El script guardará las fotos etiquetadas automáticamente según tu conducción.
+
+        Tip: Usa la tecla C para resetear el estado de las ruedas al centro si es necesario.
+
+2. Entrenamiento
+
+    Ejecuta python driving_training.py para generar un nuevo modelo_pista_vectorial.h5.
+
+    El script aplicará automáticamente el recorte (ROI) y la normalización necesaria.
+
+ Estructura del Proyecto
+
+    main.py: Script principal. Orquesta los hilos de video, IA y control.
+
+    config.py: Archivo de configuración global (IPs, Dimensiones, Umbrales).
+
+    utils.py: Módulo de utilidades. Contiene la clase VideoStream (Multithreading) y funciones de preprocesamiento.
+
+    driving/: Contiene el script de entrenamiento y el modelo de conducción.
+
+    led_recognition/: Contiene scripts de entrenamiento y el modelo de semáforo.
+
+    dataset_*/: Carpetas con las imágenes recolectadas.
+
+Autor: xarkzmv
+
+
