@@ -1,0 +1,16 @@
+__pycache__/
+
+driving/dataset_pista_vectorial/avanzar/*
+driving/dataset_pista_vectorial/avanzar_derecha/*
+driving/dataset_pista_vectorial/avanzar_izquierda/*
+
+led_recognition/dataset/train/blue_on/*
+led_recognition/dataset/train/red_on/*
+led_recognition/dataset/train/off/*
+
+led_recognition/dataset/validation/blue_on/*
+led_recognition/dataset/validation/red_on/*
+led_recognition/dataset/validation/off/*
+
+
+
